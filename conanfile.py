@@ -8,6 +8,8 @@ class mklDynamic(ConanFile):
     author = "Michael Gardner <mhgardner@berkeley.edu>"
     license = "Intel Simplified Software License"   
     settings = {"os": None, "arch": ["x86_64"]}
+    options = {"vector_math" : [True, False], "signal_proc" : [True, False]}
+    default_options = {"vector_math": True, "signal_proc" : True}
     description = "Intel Integrated Performance Primitives Static Libraries"
     exports_sources = ["CMakeLists.txt"]
     generators = "cmake"
@@ -41,4 +43,22 @@ class mklDynamic(ConanFile):
             self.copy("*", dst="lib", src=self._source_subfolder + "/lib")
         
     def package_info(self):
-        self.cpp_info.libs = tools.collect_libs(self)
+        if "vector_math" in self.options is True or "signal_proc" in self.options is True:
+            if self.settings.os == "Windows":
+                self.cpp_info.libs = ["ippcoremt"]
+            else:
+                self.cpp_info.libs = ["ippcore"]
+
+            if "vector_math" in self.options is True:
+                if self.settings.os == "Windows":
+                    self.cpp_info.libs.append("ippvmmt")
+                else:
+                    self.cpp_info.libs.append("ippvm")
+
+            if "signal_proc" in self.options is True:
+                if self.setting.os == "Windows":
+                    self.cpp_info.libs.append("ippsmt")
+                else:
+                    self.cpp_info.libs.append("ipps")
+        else:
+            self.cpp_info.libs = tools.collect_libs(self)
