@@ -43,10 +43,10 @@ class mklDynamic(ConanFile):
             self.copy("*", dst="lib", src=self._source_subfolder + "/lib")
         
     def package_info(self):
-        if "simcenter_backend" in self.options is True:
-            # if self.settings.os == "Windows":
-            #     self.cpp_info.libs = ["ippcoremt", "ippvmmt", "ippsmt"]
-            # else:
-            self.cpp_info.libs = ["ippcore", "ippvm", "ipps"]
-        else:
+        if "simcenter_backend" in self.options is False:
             self.cpp_info.libs = tools.collect_libs(self)
+        else:
+            if self.settings.os == "Windows":
+                self.cpp_info.libs = ["ippsmt", "ippvmmt", "ippcoremt"]
+            else:                           
+                self.cpp_info.libs = ["ipps", "ippvm", "ippcore"]
